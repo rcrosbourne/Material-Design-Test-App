@@ -7,6 +7,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
+import com.squareup.otto.Bus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,13 +58,13 @@ public class MyManualTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
     private VolleySingleton volleySingleton;
     private RequestQueue requestQueue;
     private ArrayList<Movie> listMovies;
-    private MyTaskListener mListener;
+    private Bus mBus;
 
 
-    public MyManualTask(MyTaskListener listener){
-        this.mListener = listener;
+    public MyManualTask(){
         volleySingleton = VolleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
+        mBus = MyApplication.getBus();
     }
 
     public static String getRequestUrl(int limit) {
@@ -83,9 +84,6 @@ public class MyManualTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
     @Override
     protected void onPostExecute(ArrayList<Movie> movies) {
         MyApplication.getBus().post(new MoviesLoadedEvent(movies));
-        if(mListener != null){
-            mListener.onMoviesFetched(movies);
-        }
         Log.d(TAG, "onPostExecute -> Job completed");
     }
 
@@ -218,10 +216,6 @@ public class MyManualTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
 
     private boolean contains(JSONObject jsonObject, String key) {
         return jsonObject != null && jsonObject.has(key) && !jsonObject.isNull(key) ? true : false;
-    }
-
-    public interface MyTaskListener{
-        void onMoviesFetched(ArrayList<Movie> movies);
     }
     @Override
     protected ArrayList<Movie> doInBackground(Void... params) {

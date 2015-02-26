@@ -43,7 +43,7 @@ import materialtest.vivz.slidenerd.tasks.MyManualTask;
  * Use the {@link FragmentBoxOffice#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentBoxOffice extends Fragment implements SortListener,MyManualTask.MyTaskListener {
+public class FragmentBoxOffice extends Fragment implements SortListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,11 +54,7 @@ public class FragmentBoxOffice extends Fragment implements SortListener,MyManual
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private VolleySingleton volleySingleton;
-    private ImageLoader imageLoader;
-    private RequestQueue requestQueue;
     private ArrayList<Movie> listMovies = new ArrayList<>();
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private AdapterBoxOffice adapterBoxOffice;
     private RecyclerView listMovieHits;
     private TextView textVolleyError;
@@ -119,7 +115,7 @@ public class FragmentBoxOffice extends Fragment implements SortListener,MyManual
                 //We should get the first batch of records
                 Log.d(TAG, "onCreateView -> Attempting to first fetch movies");
                 //Trigger job manually
-                new MyManualTask(this).execute();
+                new MyManualTask().execute();
             }
         }
         adapterBoxOffice.setMovies(listMovies);
@@ -195,15 +191,6 @@ public class FragmentBoxOffice extends Fragment implements SortListener,MyManual
         //otherwise we don't care
     }
 
-    @Override
-    public void onMoviesFetched(ArrayList<Movie> movies) {
-        //If fragment visible
-        Log.d(TAG, "onMoviesFetched -> movies fetched " + movies.size());
-        if(getUserVisibleHint()){
-            adapterBoxOffice.setMovies(movies);
-        }
-        //otherwise we don't care.
-    }
     @Override
     public void onResume() {
         super.onResume();
