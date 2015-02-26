@@ -3,6 +3,8 @@ package materialtest.vivz.slidenerd.materialtest;
 import android.app.Application;
 import android.content.Context;
 
+import com.squareup.otto.Bus;
+
 import materialtest.vivz.slidenerd.database.MoviesDatabase;
 
 /**
@@ -15,6 +17,7 @@ public class MyApplication extends Application {
     private static MyApplication sInstance;
 
     private static MoviesDatabase mDatabase;
+    private static Bus mBus;
 
     public static MyApplication getInstance() {
         return sInstance;
@@ -22,6 +25,9 @@ public class MyApplication extends Application {
 
     public static Context getAppContext() {
         return sInstance.getApplicationContext();
+    }
+    public static Bus getBus(){
+        return mBus;
     }
 
     public synchronized static MoviesDatabase getWritableDatabase() {
@@ -36,6 +42,9 @@ public class MyApplication extends Application {
         super.onCreate();
         sInstance = this;
         mDatabase = new MoviesDatabase(this);
+        if(mBus == null){
+            mBus = new Bus();
+        }
     }
 
 }
