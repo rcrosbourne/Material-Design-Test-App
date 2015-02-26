@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import materialtest.vivz.slidenerd.events.MoviesLoadedEvent;
 import materialtest.vivz.slidenerd.extras.Constants;
 import materialtest.vivz.slidenerd.logging.L;
 import materialtest.vivz.slidenerd.materialtest.MyApplication;
@@ -71,6 +72,7 @@ public class MyService extends JobService {
         private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         private VolleySingleton volleySingleton;
         private RequestQueue requestQueue;
+        private ArrayList<Movie> listMovies;
 
         MyTask(MyService myService) {
             this.myService = myService;
@@ -96,7 +98,7 @@ public class MyService extends JobService {
         protected JobParameters doInBackground(JobParameters... params) {
 
             JSONObject response = sendJsonRequest();
-            ArrayList<Movie> listMovies = parseJSONResponse(response);
+            listMovies = parseJSONResponse(response);
             MyApplication.getWritableDatabase().insertMoviesBoxOffice(listMovies,true);
             return params[0];
         }
@@ -104,6 +106,7 @@ public class MyService extends JobService {
         @Override
         protected void onPostExecute(JobParameters jobParameters) {
             myService.jobFinished(jobParameters, false);
+            MyApplication.getBus().post(new MoviesLoadedEvent(listMovies));
         }
 
         private JSONObject sendJsonRequest() {
